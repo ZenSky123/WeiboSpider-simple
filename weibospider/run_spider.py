@@ -8,6 +8,7 @@ from spiders.follower import FollowerSpider
 from spiders.user import UserSpider
 from spiders.user_simple import UserSimpleSpider
 from spiders.fan import FanSpider
+from spiders.user_tweet import UserTweetSpider
 
 if __name__ == '__main__':
     mode = sys.argv[1]
@@ -20,7 +21,8 @@ if __name__ == '__main__':
         'follow': FollowerSpider,
         'tweet': TweetSpider,
         'user': UserSpider,
-        'user_simple': UserSimpleSpider
+        'user_simple': UserSimpleSpider,
+        'user_tweet': UserTweetSpider
     }
     process.crawl(mode_to_spider[mode])
     # the script will block here until the crawling is finished
