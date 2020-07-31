@@ -54,6 +54,7 @@ class UserTweetSpider(Spider):
             yield Request(url, callback=self.parse)
 
     def parse(self, response):
+        this_is_done = False
         page_pattern = re.compile(r'page=(\d+)')
         page = int(page_pattern.search(response.url).group(1))
 
@@ -83,6 +84,7 @@ class UserTweetSpider(Spider):
                 if date < self.date_start:
                     self.user_ids_done.add(userid)
                     self.save_user_ids_done(self.user_ids_done)
+                    this_is_done = True
                     break
                 if not self.date_start <= date <= self.date_end:
                     continue
@@ -135,7 +137,8 @@ class UserTweetSpider(Spider):
 
             except Exception as e:
                 self.logger.error(e)
-        yield Request(next_page_url, self.parse, dont_filter=True, meta=response.meta, priority=1)
+        if not this_is_done:
+            yield Request(next_page_url, self.parse, dont_filter=True, meta=response.meta, priority=1)
 
     def parse_all_content(self, response):
         tree_node = etree.HTML(response.body)
