@@ -55,7 +55,6 @@ class UserTweetSpider(Spider):
 
         userid_pattern = re.compile(r'(\d+)\?page')
         userid = userid_pattern.search(response.url).group(1)
-        print('userid:', userid)
 
         next_page_url = re.sub(page_pattern, "page={}".format(page + 1), response.url)
 
@@ -73,14 +72,15 @@ class UserTweetSpider(Spider):
                 else:
                     tweet_item['created_at'] = time_fix(create_time_info.strip())
 
-                # 如果时间不合法则直接筛除
-                created_at = datetime.datetime.strptime(tweet_item['created_at'], "%Y-%m-%d %H:%M")
+                # 如果时间不合法则直接筛除 只取月和日
+                date_string = tweet_item['created_at'].split()[0]
+                date = datetime.datetime.strptime(date_string, "%Y-%m-%d")
                 # 因为微博是默认倒序排列，如果发现第一个小于指定时间的，则视为非法
-                if created_at < self.date_start:
+                if date < self.date_start:
                     self.user_ids_done.append(userid)
                     self.save_user_ids_done(self.user_ids_done)
                     break
-                if not self.date_start <= created_at <= self.date_end:
+                if not self.date_start <= date <= self.date_end:
                     continue
 
                 tweet_item['crawl_time'] = int(time.time())
