@@ -131,7 +131,7 @@ class UserTweetSpider(Spider):
 
             except Exception as e:
                 self.logger.error(e)
-        yield Request(next_page_url, self.parse, dont_filter=True, meta=response.meta)
+        yield Request(next_page_url, self.parse, dont_filter=True, meta=response.meta, priority=1)
 
     def parse_all_content(self, response):
         tree_node = etree.HTML(response.body)
