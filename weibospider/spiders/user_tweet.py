@@ -20,9 +20,13 @@ class UserTweetSpider(Spider):
     date_start = datetime.datetime.strptime("2020-01-01", '%Y-%m-%d')
     date_end = datetime.datetime.strptime("2020-07-20", '%Y-%m-%d')
 
+    user_ids_done = set()
+
     def read_user_ids_done(self):
+        s = set()
         with codecs.open('data/userid_done.txt', 'r', 'utf-8') as f:
-            return [user_id.strip() for user_id in f.read().split('\n') if user_id.strip()]
+            [s.add(user_id.strip()) for user_id in f.read().split('\n') if user_id.strip()]
+        return s
 
     def save_user_ids_done(self, ids):
         with codecs.open('data/userid_done.txt', 'w', 'utf-8') as f:
@@ -77,7 +81,7 @@ class UserTweetSpider(Spider):
                 date = datetime.datetime.strptime(date_string, "%Y-%m-%d")
                 # 因为微博是默认倒序排列，如果发现第一个小于指定时间的，则视为非法
                 if date < self.date_start:
-                    self.user_ids_done.append(userid)
+                    self.user_ids_done.add(userid)
                     self.save_user_ids_done(self.user_ids_done)
                     break
                 if not self.date_start <= date <= self.date_end:
