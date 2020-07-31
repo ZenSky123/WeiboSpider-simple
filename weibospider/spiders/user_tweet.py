@@ -123,7 +123,7 @@ class UserTweetSpider(Spider):
                 if all_content_link:
                     all_content_url = self.base_url + all_content_link[0].xpath('./@href')[0]
                     yield Request(all_content_url, callback=self.parse_all_content, meta={'item': tweet_item},
-                                  priority=1)
+                                  priority=2)
                 else:
                     tweet_html = etree.tostring(tweet_node, encoding='unicode')
                     tweet_item['content'] = extract_weibo_content(tweet_html)
