@@ -30,7 +30,7 @@ class UserTweetSpider(Spider):
 
     def start_requests(self):
         def init_url_by_user_id():
-            user_ids_done = self.read_user_ids_done()
+            self.user_ids_done = self.read_user_ids_done()
 
             user_ids = []
             for folder, _, filenames in os.walk('data/userid'):
@@ -39,7 +39,7 @@ class UserTweetSpider(Spider):
                     with codecs.open(filepath, 'r', 'utf-8') as f:
                         lines = [line.split() for line in f.read().split('\n') if line.strip()]
                         for _, userid in lines:
-                            if userid != 'unfound' and userid not in user_ids_done:
+                            if userid != 'unfound' and userid not in self.user_ids_done:
                                 user_ids.append(userid)
 
             urls = [f'{self.base_url}/{user_id}?page=1' for user_id in user_ids]
@@ -52,6 +52,10 @@ class UserTweetSpider(Spider):
     def parse(self, response):
         page_pattern = re.compile(r'page=(\d+)')
         page = int(page_pattern.search(response.url).group(1))
+
+        userid_pattern = re.compile(r'(\d+)\?page')
+        userid = userid_pattern.search(response.url).group(1)
+        print('userid:', userid)
 
         next_page_url = re.sub(page_pattern, "page={}".format(page + 1), response.url)
 
@@ -73,6 +77,8 @@ class UserTweetSpider(Spider):
                 created_at = datetime.datetime.strptime(tweet_item['created_at'], "%Y-%m-%d %H:%M")
                 # 因为微博是默认倒序排列，如果发现第一个小于指定时间的，则视为非法
                 if created_at < self.date_start:
+                    self.user_ids_done.append(userid)
+                    self.save_user_ids_done(self.user_ids_done)
                     break
                 if not self.date_start <= created_at <= self.date_end:
                     continue
