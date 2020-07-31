@@ -7,8 +7,9 @@ from scrapy.http import Request
 import time
 from items import UserItem
 import pymongo
+from settings import MONGO_HOST, MONGO_PORT
 
-client = pymongo.MongoClient(host="localhost", port=27017)
+client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
 db = client.weibo
 
 
