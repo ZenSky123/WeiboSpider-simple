@@ -20,8 +20,18 @@ class UserTweetSpider(Spider):
     date_start = datetime.datetime.strptime("2020-01-01", '%Y-%m-%d')
     date_end = datetime.datetime.strptime("2020-07-20", '%Y-%m-%d')
 
+    def read_user_ids_done(self):
+        with codecs.open('data/userid_done.txt', 'r', 'utf-8') as f:
+            return [user_id.strip() for user_id in f.read().split('\n') if user_id.strip()]
+
+    def save_user_ids_done(self, ids):
+        with codecs.open('data/userid_done.txt', 'w', 'utf-8') as f:
+            f.write('\n'.join(ids))
+
     def start_requests(self):
         def init_url_by_user_id():
+            user_ids_done = self.read_user_ids_done()
+
             user_ids = []
             for folder, _, filenames in os.walk('data/userid'):
                 for filename in filenames:
@@ -29,7 +39,7 @@ class UserTweetSpider(Spider):
                     with codecs.open(filepath, 'r', 'utf-8') as f:
                         lines = [line.split() for line in f.read().split('\n') if line.strip()]
                         for _, userid in lines:
-                            if userid != 'unfound':
+                            if userid != 'unfound' and userid not in user_ids_done:
                                 user_ids.append(userid)
 
             urls = [f'{self.base_url}/{user_id}?page=1' for user_id in user_ids]
