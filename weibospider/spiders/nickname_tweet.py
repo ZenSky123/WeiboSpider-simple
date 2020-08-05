@@ -30,16 +30,20 @@ class NicknameTweetSpider(Spider):
 
             date_start = datetime.datetime.strptime("2019-12-30", '%Y-%m-%d')
             date_end = datetime.datetime.strptime("2020-07-20", '%Y-%m-%d')
-            time_spread = datetime.timedelta(days=1)
+            time_spread = datetime.timedelta(days=60)
 
-            while date_start <= date_end:
+            while True:
+                next_date = min(date_start + time_spread, date_end)
                 for nickname in nicknames:
                     for keyword in keywords:
                         date_string = date_start.strftime("%Y%m%d")
+                        next_date_string = next_date.strftime("%Y%m%d")
                         urls.append(
-                            f'{self.base_url}/search/mblog?hideSearchFrame=&keyword={keyword}&advancedfilter=1&nick={nickname}&starttime={date_string}&endtime={date_string}&sort=time&page=1'
+                            f'{self.base_url}/search/mblog?hideSearchFrame=&keyword={keyword}&advancedfilter=1&nick={nickname}&starttime={date_string}&endtime={next_date_string}&sort=time&page=1'
                         )
-                date_start += time_spread
+                date_start = next_date
+                if next_date >= date_end:
+                    break
 
             return urls
 
