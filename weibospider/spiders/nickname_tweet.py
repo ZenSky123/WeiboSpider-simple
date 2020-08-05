@@ -17,28 +17,13 @@ class NicknameTweetSpider(Spider):
     name = "nickname_tweet_spider"
     base_url = "https://weibo.cn"
 
-    nickname_done = set()
-
-    def read_user_nickname_done(self):
-        s = set()
-        with codecs.open('data/nickname_done.txt', 'r', 'utf-8') as f:
-            [s.add(nickname.strip()) for nickname in f.read().split('\n') if nickname.strip()]
-        return s
-
-    def save_user_nickname_done(self, names):
-        with codecs.open('data/nickname_done.txt', 'w', 'utf-8') as f:
-            f.write('\n'.join(names))
-
     def start_requests(self):
         def init_url_by_user_id():
-            self.nickname_done = self.read_user_nickname_done()
-
             nicknames = []
             with codecs.open('data/nickname.txt', 'r', 'utf-8') as f:
                 lines = [line.strip() for line in f.read().split('\n') if line.strip()]
                 for nickname in lines:
-                    if nickname not in self.nickname_done:
-                        nicknames.append(nickname)
+                    nicknames.append(nickname)
 
             keywords = ['新冠', '流感', '疫', '传染']
             urls = []
