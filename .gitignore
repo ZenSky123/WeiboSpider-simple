@@ -6,3 +6,6 @@
 /data/
 /.idea/
 **/data
+/finishing/
+weibospider/__pycache__/
+weibospider/spiders/__pycache__/
